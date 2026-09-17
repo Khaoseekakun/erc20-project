@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 title BlockWallet - System (Single CMD Window)
 cd /d "%~dp0"
 

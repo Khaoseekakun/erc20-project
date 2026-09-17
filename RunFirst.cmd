@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 title BlockWallet - First Time Setup (RunFirst)
 cd /d "%~dp0"
 

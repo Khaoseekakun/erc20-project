@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 title BlockWallet - Project Build
 cd /d "%~dp0"
 
@@ -44,10 +45,18 @@ echo [2/3] Building Backend (TypeScript ^& Prisma)...
 echo ===================================================
 cd /d "%~dp0backend"
 echo Generating Prisma Client...
+:: Clean up any leftover tmp files from previous locked attempts
+del /f /q "node_modules\.prisma\client\*.tmp*" 2>nul
 call npx prisma generate
 if %errorlevel% neq 0 (
-    echo [ERROR] Prisma Client generation failed!
-    goto :error
+    if exist "node_modules\.prisma\client\index.js" (
+        echo [WARNING] Prisma Client file is locked by a running process - e.g. RunSystem.cmd
+        echo [INFO] Existing Prisma Client detected. Continuing backend build...
+    ) else (
+        echo [ERROR] Prisma Client generation failed!
+        echo [TIP] If RunSystem.cmd is currently running, please stop it via Ctrl+C and try again.
+        goto :error
+    )
 )
 
 echo Compiling Backend TypeScript...
