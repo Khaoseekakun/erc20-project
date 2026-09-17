@@ -1,0 +1,9 @@
+/backend/node_modules
+/frontend/node_modules
+/blockchain/node_modules
+
+# environment variables
+
+/backend/.env
+/frontend/.env
+/blockchain/.env
