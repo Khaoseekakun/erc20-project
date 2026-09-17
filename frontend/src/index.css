@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@theme { --font-sans: "Kanit", system-ui, sans-serif; }
+* { box-sizing: border-box; }
+html { background: #080a0f; }
+body { margin: 0; min-width: 320px; background: #080a0f; font-family: "Kanit", system-ui, sans-serif; }
+button, input { font: inherit; }
+button:not(:disabled), a, [role="button"] { cursor: pointer; }
+button, a, input { -webkit-tap-highlight-color: transparent; }
+
+.skeleton {
+  overflow: hidden;
+  position: relative;
+  background: rgb(255 255 255 / 0.055);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.085), transparent);
+  animation: shimmer 1.65s ease-in-out infinite;
+}
+.brand-logo { filter: drop-shadow(0 8px 16px rgb(96 75 255 / 0.24)); transition: transform 220ms ease, filter 220ms ease; }
+.brand-logo:hover { transform: translateY(-1px) scale(1.04); filter: drop-shadow(0 10px 22px rgb(96 75 255 / 0.38)); }
+.interactive-card { transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease; }
+.interactive-card:hover { transform: translateY(-2px); border-color: rgb(167 139 250 / 0.32); background-color: rgb(255 255 255 / 0.045); }
+
+@keyframes shimmer { to { transform: translateX(100%); } }
+@keyframes modal-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}

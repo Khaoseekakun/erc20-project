@@ -1,0 +1,11 @@
+import "dotenv/config";
+import { isAddress } from "ethers";
+const required = ["DATABASE_URL", "JWT_SECRET", "WALLET_ENCRYPTION_KEY", "SEPOLIA_RPC_URL", "ERC20_CONTRACT_ADDRESS", "ADMIN_EMAIL", "DEPLOYER_PRIVATE_KEY"] as const;
+for (const key of required) if (!process.env[key]) throw new Error(`Missing required environment variable: ${key}`);
+if ((process.env.JWT_SECRET?.length ?? 0) < 32) throw new Error("JWT_SECRET must contain at least 32 characters.");
+if (!/^[a-fA-F0-9]{64}$/.test(process.env.WALLET_ENCRYPTION_KEY!)) throw new Error("WALLET_ENCRYPTION_KEY must be exactly 64 hexadecimal characters.");
+if (!/^0x[a-fA-F0-9]{64}$/.test(process.env.DEPLOYER_PRIVATE_KEY!)) throw new Error("DEPLOYER_PRIVATE_KEY must be 0x followed by 64 hexadecimal characters.");
+if (!isAddress(process.env.ERC20_CONTRACT_ADDRESS!)) throw new Error("ERC20_CONTRACT_ADDRESS is not a valid Ethereum address.");
+const trustProxyHops = Number(process.env.TRUST_PROXY_HOPS ?? "0");
+if (!Number.isInteger(trustProxyHops) || trustProxyHops < 0) throw new Error("TRUST_PROXY_HOPS must be a non-negative integer.");
+export const env = { port: Number(process.env.PORT ?? 4000), nodeEnv: process.env.NODE_ENV ?? "development", databaseUrl: process.env.DATABASE_URL!, jwtSecret: process.env.JWT_SECRET!, encryptionKey: process.env.WALLET_ENCRYPTION_KEY!, rpcUrl: process.env.SEPOLIA_RPC_URL!, contractAddress: process.env.ERC20_CONTRACT_ADDRESS!, frontendUrl: process.env.FRONTEND_URL ?? "http://localhost:5173", etherscanBaseUrl: process.env.ETHERSCAN_BASE_URL ?? "https://sepolia.etherscan.io", adminEmail: process.env.ADMIN_EMAIL!.trim().toLowerCase(), deployerPrivateKey: process.env.DEPLOYER_PRIVATE_KEY!, trustProxyHops };

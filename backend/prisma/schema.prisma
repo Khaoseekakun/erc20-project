@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+enum TransactionDirection {
+  SEND
+  RECEIVE
+}
+model User {
+  id Int @id @default(autoincrement())
+  username String @unique @db.VarChar(30)
+  email String @unique @db.VarChar(255)
+  passwordHash String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  wallets Wallet[]
+  transactions Transaction[]
+}
+model Wallet {
+  id Int @id @default(autoincrement())
+  userId Int
+  address String @unique @db.VarChar(42)
+  encryptedPrivateKey String @db.Text
+  encryptionIv String @db.VarChar(32)
+  authTag String @db.VarChar(32)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokens WalletToken[]
+  transactions Transaction[]
+  @@index([userId])
+}
+model Token {
+  id Int @id @default(autoincrement())
+  chainId Int @default(11155111)
+  address String @unique @db.VarChar(42)
+  name String @db.VarChar(100)
+  symbol String @db.VarChar(20)
+  decimals Int
+  createdAt DateTime @default(now())
+  wallets WalletToken[]
+  transactions Transaction[]
+}
+model WalletToken {
+  walletId Int
+  tokenId Int
+  createdAt DateTime @default(now())
+  lastScannedBlock BigInt?
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  token Token @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+  @@id([walletId, tokenId])
+  @@index([tokenId])
+}
+model Transaction {
+  id Int @id @default(autoincrement())
+  userId Int
+  walletId Int?
+  tokenId Int?
+  direction TransactionDirection @default(SEND)
+  logIndex Int?
+  fromAddress String @db.VarChar(42)
+  toAddress String @db.VarChar(42)
+  amount String @db.VarChar(100)
+  tokenSymbol String @db.VarChar(20)
+  transactionHash String? @db.VarChar(66)
+  status TransactionStatus @default(PENDING)
+  errorMessage String? @db.VarChar(500)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wallet Wallet? @relation(fields: [walletId], references: [id], onDelete: SetNull)
+  token Token? @relation(fields: [tokenId], references: [id], onDelete: SetNull)
+  @@index([userId])
+  @@index([walletId])
+  @@index([tokenId])
+  @@unique([userId, transactionHash, logIndex, direction])
+  @@index([createdAt])
+  @@index([status])
+}
